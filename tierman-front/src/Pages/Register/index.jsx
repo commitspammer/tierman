@@ -1,4 +1,17 @@
+import { useState } from "react";
+
 export default function Register() {
+  const [formData, setFormData] = useState({
+    username: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleChange = (event) => {
+    const { id, value } = event.target;
+    setFormData((prevState) => ({ ...prevState, [id]: value }));
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100">
       <h1 className="text-4xl font-bold mb-4">Cadastre-se</h1>
@@ -15,6 +28,8 @@ export default function Register() {
             id="username"
             placeholder="Digite seu usuário"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={formData.username}
+            onChange={handleChange}
           />
         </div>
         <div className="mb-6">
@@ -29,6 +44,8 @@ export default function Register() {
             id="password"
             placeholder="Digite sua senha"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={formData.password}
+            onChange={handleChange}
           />
         </div>
         <div className="mb-6">
@@ -43,6 +60,8 @@ export default function Register() {
             id="confirmPassword"
             placeholder="Confirme sua senha"
             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            value={formData.confirmPassword}
+            onChange={handleChange}
           />
         </div>
         <button
