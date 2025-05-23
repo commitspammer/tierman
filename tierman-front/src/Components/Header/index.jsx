@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import style from "./style.module.scss";
 
 export default function Header() {
@@ -5,23 +6,29 @@ export default function Header() {
     <nav className={style.navbar}>
       <div className="container mx-auto flex items-center justify-between">
         <div className="text-xl font-bold">
-          <a href="#">Logo</a>
+          <Link to="/">
+            <img
+              className={style.icon}
+              src="assets/Tierman_logo.png"
+              height="36px"
+            />
+          </Link>
         </div>
         <ul className="flex gap-6">
           <li>
-            <a href="#" className="hover:text-gray-300 transition-colors">
+            <Link to="/" className="hover:text-gray-300 transition-colors">
               Categorias
-            </a>
+            </Link>
           </li>
           <li>
-            <a href="#" className="hover:text-gray-300 transition-colors">
-              Criar Templete
-            </a>
+            <Link to="/" className="hover:text-gray-300 transition-colors">
+              Criar Template
+            </Link>
           </li>
           <li>
-            <a href="#" className="hover:text-gray-300 transition-colors">
+            <Link to="/login" className="hover:text-gray-300 transition-colors">
               Login
-            </a>
+            </Link>
           </li>
         </ul>
       </div>
