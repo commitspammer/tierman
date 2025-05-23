@@ -7,10 +7,10 @@ router = APIRouter(
 )
 
 class User(BaseModel):
-    name: str
+    username: str
     password: str
 
-bob = User(name="Rob", password="admin123")
+bob = User(username="Rob", password="admin123")
 
 @router.get("/", response_model=List[User])
 def get_all():
@@ -18,4 +18,8 @@ def get_all():
 
 @router.get("/rob", response_model=User)
 def get_rob():
+    return bob
+
+@router.post("/")
+def signUp():
     return bob

@@ -5,16 +5,16 @@ from .features import login
 
 app = FastAPI()
 
+@app.get("/")
+def index():
+    return "Tierman is UP"
+
 app.include_router(login.router)
 
 class Item(BaseModel):
     name: str
     price: float
     is_offer: Union[bool, None] = None
-
-@app.get("/")
-def read_root():
-    return {"Hello": "World"}
 
 @app.get("/items/{item_id}")
 def read_item(item_id: int, q: Union[str, None] = None):
