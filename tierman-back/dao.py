@@ -1,5 +1,5 @@
 from sqlalchemy import Column, ForeignKey, Integer, String
-#from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship
 from .database import Base
 
 class User(Base):
@@ -8,6 +8,7 @@ class User(Base):
     username = Column(String)
     password = Column(String)
     email = Column(String)
+    tierlists = relationship("Tierlist")
 
 class Tierlist(Base):
     __tablename__ = "tierlists"
