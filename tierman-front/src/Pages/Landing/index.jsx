@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import Card from "../../Components/Card";
 
 export default function Landing() {
@@ -8,12 +9,12 @@ export default function Landing() {
         <p className="text-lg mb-8">
           O melhor lugar para criar e compartilhar templates de tier list!
         </p>
-        <a
-          href="/login"
+        <Link
+          to="/create-template"
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors"
         >
           Criar Template
-        </a>
+        </Link>
       </div>
       <div>
         <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
