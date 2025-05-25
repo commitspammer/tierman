@@ -2,7 +2,8 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import Union
 #from .features import login
-from .dao import User
+from .database import db
+from .dao import UserDAO
 
 app = FastAPI()
 
@@ -12,9 +13,25 @@ def index():
 
 #app.include_router(login.router)
 
-@app.post("/users/")
-def create_user():
-    raise Exception("Not yet implemented")
+class CreateUserDTO(BaseModel):
+    username: str
+    email: str
+    password: str
+
+class UserDTO(BaseModel):
+    id: str
+    username: str
+    email: str
+    password: str
+
+@app.post("/users/", response_model=UserDTO)
+def create_user(u: CreateUserDTO, db = db):
+    user_dao = UserDAO(username=u.username, email=u.email, password=u.password)
+    db.add(user_dao)
+    db.commit()
+    db.refresh(user_dao)
+    user_dto = UserDTO(id=user_dao.id, username=user_dao.username, email=user_dao.email, password=user_dao.password)
+    return user_dto
 
 
 
