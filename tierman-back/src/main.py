@@ -1,0 +1,50 @@
+from fastapi import FastAPI, Depends, HTTPException, Response
+from pydantic import BaseModel
+from typing import Union, Optional
+from .database import init_tables, get_db
+from .dao import UserDAO
+from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO
+
+init_tables()
+
+app = FastAPI()
+
+@app.get("/")
+def index():
+    return "Tierman is UP"
+
+@app.post("/users", response_model=UserNoPasswDTO)
+def create_user(u: CreateUserDTO, db = Depends(get_db)):
+    user_dao = UserDAO(
+        username=u.username,
+        email=u.email,
+        password=u.password
+    )
+    db.add(user_dao)
+    db.commit()
+    db.refresh(user_dao)
+    return UserNoPasswDTO(
+        id=user_dao.id,
+        username=user_dao.username,
+        email=user_dao.email,
+    )
+
+@app.post("/users/signin", response_model=JWTDTO)
+def sign_in(l: LoginDTO, response: Response, db = Depends(get_db)):
+    if l.email is not None:
+        user_dao = db.query(UserDAO).filter(UserDAO.email == l.email).first()
+    elif l.username is not None:
+        user_dao = db.query(UserDAO).filter(UserDAO.username == l.username).first()
+    else:
+        raise HTTPException(
+            status_code=400, #status.HTTP_400_BAD_REQUEST,
+            detail="No email nor username provided",
+        )
+    if not user_dao or user_dao.password != l.password:
+        raise HTTPException(
+            status_code=401,
+            detail="Wrong login or password",
+        )
+    jwt = "imdone"
+    response.set_cookie(key="jwt", value=jwt, expires=3600 * 24)
+    return JWTDTO(jwt=jwt)
