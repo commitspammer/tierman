@@ -4,7 +4,7 @@ from .database import Base
 
 class UserDAO(Base):
     __tablename__ = "users"
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True)
     username = Column(String)
     password = Column(String)
     email = Column(String)

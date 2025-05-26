@@ -1,9 +1,10 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 from typing import Union
-#from .features import login
-from .database import db
+from .database import init_tables, get_db
 from .dao import UserDAO
+
+init_tables()
 
 app = FastAPI()
 
@@ -11,45 +12,28 @@ app = FastAPI()
 def index():
     return "Tierman is UP"
 
-#app.include_router(login.router)
-
-class CreateUserDTO(BaseModel):
+class CreateUserDTO(BaseModel): #TODO move this to a dto.py
     username: str
     email: str
     password: str
 
-class UserDTO(BaseModel):
-    id: str
+class UserNoPasswDTO(BaseModel): #TODO this too
+    id: int
     username: str
     email: str
-    password: str
 
-@app.post("/users/", response_model=UserDTO)
-def create_user(u: CreateUserDTO, db = db):
-    user_dao = UserDAO(username=u.username, email=u.email, password=u.password)
+@app.post("/users/", response_model=UserNoPasswDTO)
+def create_user(u: CreateUserDTO, db = Depends(get_db)):
+    user_dao = UserDAO(
+        username=u.username,
+        email=u.email,
+        password=u.password
+    )
     db.add(user_dao)
     db.commit()
     db.refresh(user_dao)
-    user_dto = UserDTO(id=user_dao.id, username=user_dao.username, email=user_dao.email, password=user_dao.password)
-    return user_dto
-
-
-
-
-
-#class Item(BaseModel):
-#    name: str
-#    price: float
-#    is_offer: Union[bool, None] = None
-#
-#@app.get("/items/{item_id}")
-#def read_item(item_id: int, q: Union[str, None] = None):
-#    return {"item_id": item_id, "q": q}
-#
-#@app.put("/items/{item_id}")
-#def update_item(item_id: int, item: Item):
-#    return {"item_name": item.name, "item_id": item_id}
-#
-#@app.patch("/items/{item_id}", response_model=Item)
-#def update_item(item_id: int, item: Item):
-#    return item
+    return UserNoPasswDTO(
+        id=user_dao.id,
+        username=user_dao.username,
+        email=user_dao.email,
+    )

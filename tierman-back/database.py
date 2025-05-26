@@ -12,7 +12,9 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
-Base.metadata.create_all(bind=engine)
+
+def init_tables():
+    Base.metadata.create_all(bind=engine)
 
 def get_db():
     db = SessionLocal()
@@ -21,4 +23,4 @@ def get_db():
     finally:
         db.close()
 
-db = Annotated[Session, Depends(get_db)]
+#db = Annotated[Session, Depends(get_db)]
