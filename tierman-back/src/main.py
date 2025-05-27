@@ -21,7 +21,7 @@ def index():
 
 @app.post("/users", response_model=UserNoPasswDTO)
 def create_user(u: CreateUserDTO, db = Depends(get_db)):
-    user_dao = UserDAO(
+    user_dao = UserDAO( #TODO validate for empty string
         username=u.username,
         email=u.email,
         password=u.password
@@ -35,29 +35,23 @@ def create_user(u: CreateUserDTO, db = Depends(get_db)):
         email=user_dao.email,
     )
 
-@app.post("/users/signin", response_model=JWTDTO)
-def sign_in(l: LoginDTO, res: Response, db = Depends(get_db)):
-    if l.email is not None:
-        user_dao = db.query(UserDAO).filter(UserDAO.email == l.email).first()
-    elif l.username is not None:
-        user_dao = db.query(UserDAO).filter(UserDAO.username == l.username).first()
-    else:
-        raise HTTPException(
-            status_code=400, #status.HTTP_400_BAD_REQUEST,
-            detail="No email nor username provided",
-        )
+@app.post("/users/login", response_model=JWTDTO)
+def log_in(l: LoginDTO, res: Response, db = Depends(get_db)):
+    user_dao = db.query(UserDAO).filter(UserDAO.email == l.login).first()
+    if not user_dao:
+        user_dao = db.query(UserDAO).filter(UserDAO.username == l.login).first()
     if not user_dao or user_dao.password != l.password:
         raise HTTPException(
             status_code=401,
             detail="Wrong login or password",
         )
-    jwt = user_dao.id
+    jwt = str(user_dao.id)
     res.set_cookie(key="jwt", value=jwt, expires=3600 * 24)
     return JWTDTO(jwt=jwt)
 
 @app.post("/tierlists", response_model=TierlistDTO)
 def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
-    uid = req.cookies.get("jwt")
+    uid = int(req.cookies.get("jwt"))
     tl_dao = TierlistDAO(
         name = tl.name,
         owner_id = uid,

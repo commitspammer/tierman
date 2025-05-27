@@ -12,12 +12,11 @@ class UserNoPasswDTO(BaseModel):
     email: str
 
 class LoginDTO(BaseModel):
-    username: Optional[str] = None
-    email: Optional[str] = None
+    login: str
     password: str
 
 class JWTDTO(BaseModel):
-    jwt: int
+    jwt: str
 
 class CreateTierlistDTO(BaseModel):
     name: str
