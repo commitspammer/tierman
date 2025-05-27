@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional#, Union
+from typing import List, Optional#, Union
 
 class CreateUserDTO(BaseModel):
     username: str
@@ -17,7 +17,13 @@ class LoginDTO(BaseModel):
     password: str
 
 class JWTDTO(BaseModel):
-    jwt: str
+    jwt: int
 
 class CreateTierlistDTO(BaseModel):
     name: str
+
+class TierlistDTO(BaseModel):
+    id: int
+    owner_id: int
+    name: str
+    tiers: List[str]

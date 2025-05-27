@@ -8,10 +8,11 @@ class UserDAO(Base):
     username = Column(String)
     password = Column(String)
     email = Column(String)
-    #tierlists = relationship("TierlistDAO")
+    tierlists = relationship("TierlistDAO")
 
-#class TierlistDAO(Base):
-#    __tablename__ = "tierlists"
-#    id = Column(Integer, primary_key=True, index=True)
-#    is_template = Column(String)
-#    owner_id = Column(Integer, ForeignKey("users.id"))
+class TierlistDAO(Base):
+    __tablename__ = "tierlists"
+    id = Column(Integer, primary_key=True)
+    owner_id = Column(Integer, ForeignKey("users.id"))
+    name = Column(String)
+    is_template = Column(String)
