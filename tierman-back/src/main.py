@@ -1,13 +1,21 @@
 from fastapi import FastAPI, Depends, HTTPException, Response
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import Union, Optional
 from .database import init_tables, get_db
 from .dao import UserDAO
-from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO
+from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, CreateTierlistDTO
 
 init_tables()
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[""],
+    allow_credentials=True,
+    allow_methods=[""],
+    allow_headers=["*"],
+)
 
 @app.get("/")
 def index():
@@ -48,3 +56,7 @@ def sign_in(l: LoginDTO, response: Response, db = Depends(get_db)):
     jwt = "imdone"
     response.set_cookie(key="jwt", value=jwt, expires=3600 * 24)
     return JWTDTO(jwt=jwt)
+
+@app.post("/tierlists")
+def create_tierlist(t: CreateTierlistDTO, db = Depends(get_db)):
+    raise Exception("Not yet implemented")

@@ -18,3 +18,6 @@ class LoginDTO(BaseModel):
 
 class JWTDTO(BaseModel):
     jwt: str
+
+class CreateTierlistDTO(BaseModel):
+    name: str
