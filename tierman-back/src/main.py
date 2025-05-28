@@ -1,9 +1,9 @@
 from fastapi import FastAPI, Depends, HTTPException, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Union, Optional
+from typing import Union, Optional, List
 from .database import init_tables, get_db
-from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO
+from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO
 
@@ -54,64 +54,69 @@ def log_in(l: LoginDTO, res: Response, db = Depends(get_db)):
 def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
     uid = int(req.cookies.get("jwt"))
     tiers_dao = []
-    for t in tl.tiers:
-        images_dao = []
-        for i in t.images:
-            images_dao.append(ImageDAO(
-                path = i.path
-            ))
-        tiers_dao.append(TierDAO(
-            name = t.name,
-            images = images_dao
-        ))
+    image_assocs_dao = []
     tl_dao = TierlistDAO(
         name = tl.name,
         owner_id = uid,
         is_template = True,
-        tiers = tiers_dao
+        tiers = tiers_dao,
+        image_assocs = image_assocs_dao
     )
+    for i in tl.images:
+        image_assocs_dao.append(ImageAssociationsDAO(
+            image = ImageDAO(
+                path = i.path
+            ),
+            tierlist = tl_dao
+        ))
+    for t in tl.tiers:
+        tiers_dao.append(TierDAO(
+            name = t.name,
+            tierlist = tl_dao,
+        ))
     db.add(tl_dao)
     db.commit()
     db.refresh(tl_dao)
 
-    tiers_dto = []
+    tiers_dto: List[TierDTO] = []
+    bag: List[ImageDTO] = []
     for t in tl_dao.tiers:
-        images_dto = []
-        for i in t.images:
-            images_dto.append(ImageDTO(
-                id = i.id,
-                path = i.path,
-                tier_id = t.id
-            ))
         tiers_dto.append(TierDTO(
             id = t.id,
             name = t.name,
             tierlist_id = t.tierlist_id,
-            images = images_dto
+            images = []
         ))
+    for ia in tl_dao.image_assocs:
+        if ia.tierlist_id != tl_dao.id:
+            continue
+        i = ia.image
+        if ia.tier_id is None:
+            bag.append(ImageDTO(
+                id = i.id,
+                path = i.path,
+                tier_id = None,
+                tierlist_id = tl_dao.id
+            ))
+            continue
+        for t in tiers_dto:
+            if t.id == ia.tier_id:
+                t.images.append(ImageDTO(
+                    id = i.id,
+                    path = i.path,
+                    tier_id = t.id,
+                    tierlist_id = tl_dao.id
+                ))
+                break
     return TierlistDTO(
         id = tl_dao.id,
         name = tl_dao.name,
         owner_id = tl_dao.owner_id,
         is_template = tl_dao.is_template,
-        tiers = tiers_dto
+        tiers = tiers_dto,
+        bag = bag
     )
 
-#@app.post("/tierlists/{tierlist_id}", tierlist_id: int, response_model=TierlistDTO)
-#def add_tierlists(tl: TierlistsDTO, req: Request, db = Depends(get_db)):
-#    uid = int(req.cookies.get("jwt"))
-#    tl_dao = TierlistDAO(
-#        name = tl.name,
-#        owner_id = uid,
-#        is_template = True
-#    )
-#    db.add(tl_dao)
-#    db.commit()
-#    db.refresh(tl_dao)
-#    return TierlistDTO(
-#        id=tl_dao.id,
-#        name=tl_dao.name,
-#        owner_id=tl_dao.owner_id,
-#        tiers=[]
-#        #tiers=tl_dao.tiers,
-#    )
+@app.get("/tierlists", response_model=List[TierlistDTO])
+def list_tierlists(req: Request, db = Depends(get_db)):
+    pass

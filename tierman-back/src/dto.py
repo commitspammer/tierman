@@ -23,16 +23,16 @@ class CreateImageDTO(BaseModel):
 
 class CreateTierDTO(BaseModel):
     name: str
-    images: List[CreateImageDTO]
 
 class CreateTierlistDTO(BaseModel):
     name: str
     tiers: List[CreateTierDTO]
+    images: List[CreateImageDTO]
 
 class ImageDTO(BaseModel):
     id: int
-    #tierlist_id: int
-    tier_id: int
+    tierlist_id: int
+    tier_id: Optional[int]
     path: str
 
 class TierDTO(BaseModel):
@@ -45,4 +45,6 @@ class TierlistDTO(BaseModel):
     id: int
     owner_id: int
     name: str
+    is_template: bool
     tiers: List[TierDTO]
+    bag: List[ImageDTO]
