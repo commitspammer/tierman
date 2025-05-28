@@ -18,11 +18,31 @@ class LoginDTO(BaseModel):
 class JWTDTO(BaseModel):
     jwt: str
 
+class CreateImageDTO(BaseModel):
+    path: str
+
+class CreateTierDTO(BaseModel):
+    name: str
+    images: List[CreateImageDTO]
+
 class CreateTierlistDTO(BaseModel):
     name: str
+    tiers: List[CreateTierDTO]
+
+class ImageDTO(BaseModel):
+    id: int
+    #tierlist_id: int
+    tier_id: int
+    path: str
+
+class TierDTO(BaseModel):
+    id: int
+    tierlist_id: int
+    name: str
+    images: List[ImageDTO]
 
 class TierlistDTO(BaseModel):
     id: int
     owner_id: int
     name: str
-    tiers: List[str]
+    tiers: List[TierDTO]
