@@ -1,5 +1,5 @@
 import shutil
-from fastapi import FastAPI, Depends, HTTPException, Request, Response, File, UploadFile
+from fastapi import FastAPI, Depends, HTTPException, Request, Response, File, UploadFile, Path
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -9,6 +9,7 @@ from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, UploadedImagesDTO
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO
+from sqlalchemy.orm import joinedload
 
 init_tables()
 
@@ -138,3 +139,61 @@ def upload_images(files: List[UploadFile] = File(...)):
 @app.get("/tierlists", response_model=List[TierlistDTO])
 def list_tierlists(req: Request, db = Depends(get_db)):
     pass
+
+@app.get("/tierlists/{id}", response_model=TierlistDTO)
+def get_tierlist_by_id(
+    id: int = Path(..., description="Tierlist ID"),
+    db = Depends(get_db)
+):
+    tl_dao = db.query(TierlistDAO)\
+        .options(
+            joinedload(TierlistDAO.tiers),
+            joinedload(TierlistDAO.image_assocs).joinedload(ImageAssociationsDAO.image)
+        )\
+        .filter(TierlistDAO.id == id)\
+        .first()
+
+    if not tl_dao:
+        raise HTTPException(status_code=404, detail="Tierlist not found")
+
+    tiers_dto: List[TierDTO] = []
+    bag: List[ImageDTO] = []
+
+    for t in tl_dao.tiers:
+        tiers_dto.append(TierDTO(
+            id=t.id,
+            name=t.name,
+            color=t.color,
+            tierlist_id=t.tierlist_id,
+            images=[]
+        ))
+
+    for ia in tl_dao.image_assocs:
+        i = ia.image
+        if ia.tier_id is None:
+            bag.append(ImageDTO(
+                id=i.id,
+                path=i.path,
+                tier_id=None,
+                tierlist_id=tl_dao.id
+            ))
+            continue
+
+        for t in tiers_dto:
+            if t.id == ia.tier_id:
+                t.images.append(ImageDTO(
+                    id=i.id,
+                    path=i.path,
+                    tier_id=t.id,
+                    tierlist_id=tl_dao.id
+                ))
+                break
+
+    return TierlistDTO(
+        id=tl_dao.id,
+        name=tl_dao.name,
+        owner_id=tl_dao.owner_id,
+        is_template=tl_dao.is_template,
+        tiers=tiers_dto,
+        bag=bag
+    )
