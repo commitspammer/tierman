@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Union, Optional, List
+from .auth import get_uid
 from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, UploadedImagesDTO
@@ -55,7 +56,7 @@ def log_in(l: LoginDTO, res: Response, db = Depends(get_db)):
 
 @app.post("/tierlists", response_model=TierlistDTO)
 def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
-    uid = int(req.cookies.get("jwt"))
+    uid = get_uid(req)
     tiers_dao = []
     image_assocs_dao = []
     tl_dao = TierlistDAO(
