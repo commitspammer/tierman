@@ -16,14 +16,10 @@ export default function CardDrag({ imageUrl, id }) {
       ref={setNodeRef}
       {...listeners}
       {...attributes}
-      className="w-[100px] h-[100px] bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-200 dark:border-gray-700"
+      className="w-[100px] h-[100px] bg-white border border-gray-200  shadow-sm dark:bg-gray-200 dark:border-gray-700 gap-2"
       style={style}
     >
-      <img
-        className="w-full h-full object-fill rounded-t-lg"
-        src={imageUrl}
-        alt=""
-      />
+      <img className="w-full h-full object-fill" src={imageUrl} alt="" />
     </div>
   );
 }

@@ -10,9 +10,9 @@ export default function TierDrop({ tierData, cards }) {
   console.log("TierDrop", cards);
 
   return (
-    <div className="flex w-full h-[100px] flex-row bg-neutral-800 gap-4 justify-center items-center border-b border-orange-50">
+    <div className="flex w-full h-[100px] flex-row justify-center items-center mb-0.5">
       <h2
-        className={`font-semibold text-neutral-100 w-[10%] h-full flex items-center justify-center`}
+        className={`font-semibold text-neutral-100 w-[10%] min-h-[100px] flex items-center justify-center`}
         style={{ backgroundColor: tierData.color ?? "#ffffff" }}
       >
         {tierData.name}
@@ -20,7 +20,7 @@ export default function TierDrop({ tierData, cards }) {
       <div className="flex flex-1 flex-col gap-4">
         <div
           ref={setNodeRef}
-          className="cursor-grab rounded-lg flex p-4 shadow-sm hover:shadow-md"
+          className="cursor-grab  flex bg-neutral-700 min-h-[100px] "
         >
           {cards.map((card) => (
             <CardDrag id={card.id} imageUrl={`${backURL}${card.path}`} />

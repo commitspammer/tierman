@@ -1,4 +1,4 @@
-import { DndContext, useDroppable } from "@dnd-kit/core";
+import { DndContext } from "@dnd-kit/core";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import CardDrag from "../../Components/CardDrag";
@@ -8,12 +8,7 @@ import { api, backURL } from "../../Services/api";
 export default function TierlistFill() {
   const { id } = useParams();
   const [tiers, setTiers] = useState([]);
-
   const [bag, setBag] = useState([]);
-
-  const { setNodeRef } = useDroppable({
-    id: null,
-  });
 
   useEffect(() => {
     api
@@ -22,6 +17,7 @@ export default function TierlistFill() {
         console.log(response.data);
         if (response.status === 200 || response.status === 201) {
           setTiers(response.data.tiers);
+          console.log(response.data.bag);
           setBag(response.data.bag);
         } else {
           console.error("Erro ao buscar tierlist:", response.data);
@@ -63,25 +59,16 @@ export default function TierlistFill() {
             cards={bag.filter((image) => image.tier_id === tier.id)}
           />
         ))}
-        <div className="flex w-full h-[100px] flex-row bg-neutral-800 gap-4 justify-center items-center border-b border-orange-50">
-          <h2 className="font-semibold text-neutral-100 w-[10%] h-[100px] flex items-center justify-center">
-            Imagens
-          </h2>
-          <div className="flex flex-1 flex-col gap-4">
-            <div
-              ref={setNodeRef}
-              className="cursor-grab rounded-lg flex p-4 shadow-sm hover:shadow-md"
-            >
-              {bag
-                .filter((image) => image.tier_id === null)
-                .map((image) => (
-                  <CardDrag
-                    id={image.id}
-                    imageUrl={`${backURL}${image.path}`}
-                  />
-                ))}
-            </div>
-          </div>
+        <div className="cursor-grab rounded-lg grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 bg-neutral-700 min-h-[100px] mt-8 p-4 ">
+          {bag
+            .filter((image) => image.tier_id === null)
+            .map((image) => (
+              <CardDrag
+                key={image.id}
+                id={image.id}
+                imageUrl={`${backURL}${image.path}`}
+              />
+            ))}
         </div>
       </DndContext>
     </div>
