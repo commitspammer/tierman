@@ -50,3 +50,6 @@ class TierlistDTO(BaseModel):
     is_template: bool
     tiers: List[TierDTO]
     bag: List[ImageDTO]
+
+class UploadedImagesDTO(BaseModel):
+    paths: List[str]

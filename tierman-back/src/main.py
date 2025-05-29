@@ -1,15 +1,18 @@
-from fastapi import FastAPI, Depends, HTTPException, Request, Response
+import shutil
+from fastapi import FastAPI, Depends, HTTPException, Request, Response, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import Union, Optional, List
 from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
-from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO
+from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, UploadedImagesDTO
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO
 
 init_tables()
 
 app = FastAPI()
+app.mount("/public", StaticFiles(directory="public"), name="public")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], allow_credentials=True,
@@ -117,6 +120,18 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
         is_template = tl_dao.is_template,
         tiers = tiers_dto,
         bag = bag
+    )
+
+@app.post("/images")
+def upload_images(files: List[UploadFile] = File(...)):
+    paths = []
+    for f in files:
+        file_path = f"public/{f.filename}"
+        with open(file_path, "wb+") as file_obj:
+            shutil.copyfileobj(f.file, file_obj)
+            paths.append(file_path)
+    return UploadedImagesDTO(
+        paths = paths
     )
 
 @app.get("/tierlists", response_model=List[TierlistDTO])
