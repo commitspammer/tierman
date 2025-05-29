@@ -18,6 +18,11 @@ class LoginDTO(BaseModel):
 class JWTDTO(BaseModel):
     jwt: str
 
+class UpdateUserDTO(BaseModel):
+    username: str
+    email: str
+    password: Optional[str] = None
+
 class CreateImageDTO(BaseModel):
     path: str
 

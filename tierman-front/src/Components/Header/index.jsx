@@ -1,7 +1,9 @@
 import { Link } from "react-router-dom";
+import { getJwt } from "../../Services/api";
 import style from "./style.module.scss";
 
 export default function Header() {
+  const loggedIn = getJwt("jwt");
   return (
     <nav className={style.navbar}>
       <div className="container mx-auto flex items-center justify-between ">
@@ -29,9 +31,18 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to="/login" className="hover:text-gray-300 transition-colors">
-              Login
-            </Link>
+            { loggedIn ?
+              <>
+                <Link to="/profile" className="hover:text-gray-300 transition-colors">
+                  Perfil
+                </Link>
+              </> :
+              <>
+                <Link to="/login" className="hover:text-gray-300 transition-colors">
+                  Login
+                </Link>
+              </>
+            }
           </li>
         </ul>
       </div>

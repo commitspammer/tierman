@@ -7,7 +7,7 @@ from typing import Union, Optional, List
 from .auth import get_uid
 from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
-from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, UploadedImagesDTO
+from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, UpdateUserDTO, JWTDTO, UploadedImagesDTO
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistAllDTO
 from sqlalchemy.orm import joinedload
 import random
@@ -55,6 +55,42 @@ def log_in(l: LoginDTO, res: Response, db = Depends(get_db)):
     jwt = str(user_dao.id)
     res.set_cookie(key="jwt", value=jwt, expires=3600 * 24)
     return JWTDTO(jwt=jwt)
+
+@app.get("/users/{id}", response_model=UserNoPasswDTO)
+def get_user(id: int, res: Response, db = Depends(get_db)):
+    user_dao = db.query(UserDAO).filter(UserDAO.id == id).first()
+    if not user_dao:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+    return UserNoPasswDTO(
+        id=user_dao.id,
+        username=user_dao.username,
+        email=user_dao.email,
+    )
+
+@app.put("/users/{id}", response_model=UserNoPasswDTO)
+def update_user(u: UpdateUserDTO, id: int, db = Depends(get_db)):
+    user_dao = db.query(UserDAO).filter(UserDAO.id == id).first()
+    if not user_dao:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+    user_dao.username = u.username
+    user_dao.email = u.email
+    print(u.password)
+    if u.password is not None:
+        user_dao.password = u.password 
+    db.add(user_dao)
+    db.commit()
+    db.refresh(user_dao)
+    return UserNoPasswDTO(
+        id=user_dao.id,
+        username=user_dao.username,
+        email=user_dao.email,
+    )
 
 @app.post("/tierlists", response_model=TierlistDTO)
 def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
