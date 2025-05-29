@@ -5,6 +5,7 @@ import Landing from "../Pages/Landing";
 import Login from "../Pages/Login";
 import Register from "../Pages/Register";
 import TierCreate from "../Pages/TierCreate";
+import TierlistFill from "../Pages/TierlistFill";
 
 const routes = createBrowserRouter([
   {
@@ -13,6 +14,8 @@ const routes = createBrowserRouter([
       { path: "/", element: <Landing /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
+      { path: "/tierlist", element: <TierlistFill /> },
+      // { path: "/create-template", element: <TierCreate /> },
       {
         element: <ProtectedRoute />,
         children: [{ path: "/create-template", element: <TierCreate /> }],

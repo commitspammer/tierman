@@ -8,13 +8,12 @@ export const api = axios.create({
   },
 });
 
-export const getCookie = (name) => {
-  const match = document.cookie.match(new RegExp("(^| )" + name + "=([^;]+)"));
-  return match ? match[2] : null;
+export const getJwt = (name) => {
+  return localStorage.getItem(name) || null;
 };
 
 api.interceptors.request.use((config) => {
-  const jwt = getCookie("jwt");
+  const jwt = getJwt("jwt");
   if (jwt) {
     config.headers.Authorization = `Bearer ${jwt}`;
   }

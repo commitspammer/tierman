@@ -40,9 +40,7 @@ export default function Login() {
                 password: "",
               });
 
-              document.cookie = `jwt=${response.data.jwt}; path=/; max-age=${
-                60 * 60 * 24
-              }`;
+              localStorage.setItem("jwt", response.data.jwt);
 
               navigate("/");
             },
@@ -50,7 +48,6 @@ export default function Login() {
         }
       })
       .catch((error) => {
-        console.error("Erro ao entrar:", error);
         toast.error(error, {
           position: "top-right",
           autoClose: 3000,
@@ -66,7 +63,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100 mt-8">
       <h1 className="text-4xl font-bold mb-4">Login</h1>
       <form className="bg-white p-6 rounded shadow-md w-96">
         <div className="mb-4">

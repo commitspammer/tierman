@@ -1,13 +1,13 @@
 import { useEffect, useRef } from "react";
 import { Navigate, Outlet } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
-import { getCookie } from "../../Services/api";
+import { getJwt } from "../../Services/api";
 
 export default function ProtectedRoute() {
   const runOnce = useRef(false);
 
   const isAuthenticated = () => {
-    return getCookie("jwt") ? true : false;
+    return getJwt("jwt") ? true : false;
   };
 
   useEffect(() => {

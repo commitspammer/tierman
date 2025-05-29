@@ -95,7 +95,7 @@ export default function Register() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100">
+    <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100 mt-8">
       <h1 className="text-4xl font-bold mb-4">Cadastre-se</h1>
       <form className="bg-white p-6 rounded shadow-md w-96">
         <div className="mb-4">

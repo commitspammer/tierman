@@ -4,7 +4,7 @@ import style from "./style.module.scss";
 export default function Header() {
   return (
     <nav className={style.navbar}>
-      <div className="container mx-auto flex items-center justify-between">
+      <div className="container mx-auto flex items-center justify-between ">
         <div className="text-xl font-bold">
           <Link to="/">
             <img
@@ -21,7 +21,10 @@ export default function Header() {
             </Link>
           </li>
           <li>
-            <Link to="/" className="hover:text-gray-300 transition-colors">
+            <Link
+              to="/create-template"
+              className="hover:text-gray-300 transition-colors"
+            >
               Criar Template
             </Link>
           </li>
