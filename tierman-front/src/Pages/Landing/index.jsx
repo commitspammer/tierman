@@ -1,7 +1,48 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Bounce, toast } from "react-toastify";
 import Card from "../../Components/Card";
+import { api, backURL } from "../../Services/api";
 
 export default function Landing() {
+  const [tierLists, setTierLists] = useState([]);
+
+  useEffect(() => {
+    api
+      .get("/tierlists")
+      .then((response) => {
+        if (response.status === 200 || response.status === 201) {
+          console.log(response.data);
+          setTierLists(response.data);
+        } else {
+          toast.error("Erro ao buscar tierlists", {
+            position: "top-right",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+            transition: Bounce,
+          });
+        }
+      })
+      .catch((error) => {
+        toast.error(error, {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+      });
+  }, []);
+
   return (
     <div className=" bg-gray-100 overflow-y-auto">
       <div className=" text-center py-10">
@@ -19,15 +60,14 @@ export default function Landing() {
       <div>
         <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
         <div className="flex flex-wrap gap-4">
-          {Array(10)
-            .keys()
-            .map((key) => (
-              <Card
-                key={key}
-                description={"Um tier criado"}
-                imageUrl={"assets/Tierman_logo.png"}
-              />
-            ))}
+          {tierLists.map((item, key) => (
+            <Card
+              key={key}
+              id={item.id}
+              description={item.name}
+              imageUrl={`${backURL}${item.cover_image_path}`}
+            />
+          ))}
         </div>
       </div>
     </div>

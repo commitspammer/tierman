@@ -1,7 +1,9 @@
-export default function Card({ description, imageUrl }) {
+import { Link } from "react-router-dom";
+
+export default function Card({ description, imageUrl, id }) {
   return (
     <div className="w-[140px] h-[130px] bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-200 dark:border-gray-700">
-      <a href="#" className="block relative w-full h-full">
+      <Link to={`/tierlist/${id}`} className="block relative w-full h-full">
         <div className="relative w-full h-full">
           <img
             className="w-full h-full object-cover rounded-t-lg"
@@ -12,7 +14,7 @@ export default function Card({ description, imageUrl }) {
             {description}
           </div>
         </div>
-      </a>
+      </Link>
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { useState } from "react";
 export default function FormCreateTier({ setCreatingTier, setTiers }) {
   const [formData, setFormData] = useState({
     name: "",
-    color: "",
+    color: undefined,
   });
 
   const handleChange = (event) => {
@@ -15,7 +15,7 @@ export default function FormCreateTier({ setCreatingTier, setTiers }) {
     event.preventDefault();
     setTiers((prevTiers) => [...prevTiers, formData]);
     setCreatingTier(false);
-    setFormData({ name: "", color: "" });
+    setFormData({ name: "", color: undefined });
   };
 
   return (

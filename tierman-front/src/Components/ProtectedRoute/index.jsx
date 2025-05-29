@@ -12,7 +12,6 @@ export default function ProtectedRoute() {
 
   useEffect(() => {
     if (runOnce.current) return;
-    console.log("isAuthenticated", isAuthenticated());
     if (!isAuthenticated()) {
       toast.error("Você precisa estar logado para acessar esta página.", {
         position: "top-right",

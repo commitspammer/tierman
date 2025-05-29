@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import FormCreateTier from "../../Components/FormCreateTier";
 import ImageUploader from "../../Components/ImageUploader";
@@ -6,58 +7,74 @@ import Tier from "../../Components/Tier";
 import { api } from "../../Services/api";
 
 export default function TierCreate() {
+  const navigate = useNavigate();
   const [tiers, setTiers] = useState([]);
   const [tierListName, setTierListName] = useState("");
   const [creatingTier, setCreatingTier] = useState(true);
+  const [files, setFiles] = useState([]);
 
   const handleImages = (files) => {
-    console.log("Selected images:", files);
+    setFiles(files);
   };
 
-  const handleSubmit = () => {
-    const tierListData = {
-      name: tierListName,
-      tiers: tiers.map((tier) => ({ name: tier.name, color: tier.color })),
-      images: [],
-    };
+  const handleSubmit = async () => {
+    if (!files || files.length === 0) {
+      toast.warn("Selecione ao menos uma imagem.", {
+        position: "top-right",
+        autoClose: 2000,
+        theme: "light",
+        transition: Bounce,
+      });
+      return;
+    }
 
-    api
-      .post("/tierlists", tierListData)
-      .then((response) => {
-        if (response.status === 201 || response.status === 200) {
-          toast.success("Tierlist criada com sucesso com sucesso!", {
+    const formData = new FormData();
+    for (const file of files) {
+      formData.append("files", file);
+    }
+
+    try {
+      const response = await api.post("/images", formData);
+
+      if (response.status === 200 || response.status === 201) {
+        const tierListData = {
+          name: tierListName,
+          tiers: tiers.map(({ name, color }) => ({ name, color })),
+          images: response.data.paths.map((path) => ({ path })),
+        };
+
+        const tierlistResponse = await api.post("/tierlists", tierListData);
+
+        if (
+          tierlistResponse.status === 200 ||
+          tierlistResponse.status === 201
+        ) {
+          toast.success("Tierlist criada com sucesso!", {
             position: "top-right",
             autoClose: 1000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
             theme: "light",
             transition: Bounce,
             onClose: () => {
               setTierListName("");
               setTiers([]);
               setCreatingTier(true);
-
               navigate("/");
             },
           });
         }
-      })
-      .catch((error) => {
-        toast.error(error, {
+      }
+    } catch (error) {
+      toast.error(
+        "Erro ao criar tierlist: " +
+          (error?.response?.data?.detail || error.message),
+        {
           position: "top-right",
           autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
           theme: "light",
           transition: Bounce,
-        });
-      });
+        }
+      );
+    }
   };
 
   return (

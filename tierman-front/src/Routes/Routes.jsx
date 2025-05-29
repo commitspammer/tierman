@@ -14,8 +14,7 @@ const routes = createBrowserRouter([
       { path: "/", element: <Landing /> },
       { path: "/login", element: <Login /> },
       { path: "/register", element: <Register /> },
-      { path: "/tierlist", element: <TierlistFill /> },
-      // { path: "/create-template", element: <TierCreate /> },
+      { path: "/tierlist/:id", element: <TierlistFill /> },
       {
         element: <ProtectedRoute />,
         children: [{ path: "/create-template", element: <TierCreate /> }],
