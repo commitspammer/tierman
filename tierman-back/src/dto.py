@@ -51,5 +51,12 @@ class TierlistDTO(BaseModel):
     tiers: List[TierDTO]
     bag: List[ImageDTO]
 
+class TierlistAllDTO(BaseModel):
+    id: int
+    owner_id: int
+    name: str
+    is_template: bool
+    cover_image_path: Optional[str] = None
+
 class UploadedImagesDTO(BaseModel):
     paths: List[str]

@@ -8,8 +8,9 @@ from .auth import get_uid
 from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, JWTDTO, UploadedImagesDTO
-from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO
+from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistAllDTO
 from sqlalchemy.orm import joinedload
+import random
 
 init_tables()
 
@@ -124,21 +125,30 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
         bag = bag
     )
 
-@app.post("/images")
-def upload_images(files: List[UploadFile] = File(...)):
-    paths = []
-    for f in files:
-        file_path = f"public/{f.filename}"
-        with open(file_path, "wb+") as file_obj:
-            shutil.copyfileobj(f.file, file_obj)
-            paths.append(file_path)
-    return UploadedImagesDTO(
-        paths = paths
-    )
-
-@app.get("/tierlists", response_model=List[TierlistDTO])
+@app.get("/tierlists", response_model=List[TierlistAllDTO])
 def list_tierlists(req: Request, db = Depends(get_db)):
-    pass
+    tl_dao_list = db.query(TierlistDAO)\
+        .options(joinedload(TierlistDAO.image_assocs).joinedload(ImageAssociationsDAO.image))\
+        .order_by(TierlistDAO.id.desc())\
+        .all()
+
+    result = []
+    for tl in tl_dao_list:
+        imagens = [ia.image for ia in tl.image_assocs if ia.tierlist_id == tl.id]
+        capa = random.choice(imagens) if imagens else None
+        capa_path = capa.path if capa else None
+
+        result.append(
+            TierlistAllDTO(
+                id=tl.id,
+                name=tl.name,
+                owner_id=tl.owner_id,
+                is_template=tl.is_template,
+                cover_image_path=capa_path
+            )
+        )
+
+    return result
 
 @app.get("/tierlists/{id}", response_model=TierlistDTO)
 def get_tierlist_by_id(
@@ -196,4 +206,16 @@ def get_tierlist_by_id(
         is_template=tl_dao.is_template,
         tiers=tiers_dto,
         bag=bag
+    )
+
+@app.post("/images")
+def upload_images(files: List[UploadFile] = File(...)):
+    paths = []
+    for f in files:
+        file_path = f"public/{f.filename}"
+        with open(file_path, "wb+") as file_obj:
+            shutil.copyfileobj(f.file, file_obj)
+            paths.append(file_path)
+    return UploadedImagesDTO(
+        paths = paths
     )
