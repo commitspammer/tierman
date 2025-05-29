@@ -23,6 +23,7 @@ class CreateImageDTO(BaseModel):
 
 class CreateTierDTO(BaseModel):
     name: str
+    color: str
 
 class CreateTierlistDTO(BaseModel):
     name: str
@@ -39,6 +40,7 @@ class TierDTO(BaseModel):
     id: int
     tierlist_id: int
     name: str
+    color: str
     images: List[ImageDTO]
 
 class TierlistDTO(BaseModel):

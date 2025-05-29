@@ -24,6 +24,7 @@ class TierDAO(Base):
     __tablename__ = "tiers"
     id = Column(Integer, primary_key=True)
     name = Column(String)
+    color = Column(String)
     tierlist_id = Column(Integer, ForeignKey("tierlists.id")) 
     tierlist = relationship("TierlistDAO", back_populates="tiers")
     #images = relationship("ImageAssociationsDAO")

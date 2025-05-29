@@ -72,6 +72,7 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
     for t in tl.tiers:
         tiers_dao.append(TierDAO(
             name = t.name,
+            color = t.color,
             tierlist = tl_dao,
         ))
     db.add(tl_dao)
@@ -84,6 +85,7 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
         tiers_dto.append(TierDTO(
             id = t.id,
             name = t.name,
+            color = t.color,
             tierlist_id = t.tierlist_id,
             images = []
         ))
