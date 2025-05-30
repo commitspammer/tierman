@@ -114,10 +114,40 @@ export default function Profile() {
     }
   };
 
+  const handleDelete = (event) => {
+    const id = getJwt("jwt")
+    api
+      .delete(`/users/${id}`)
+      .then((response) => {
+        console.log(response.data);
+        if (response.status === 200 || response.status === 201) {
+          localStorage.removeItem("jwt")
+          navigate('/')
+        } else {
+          console.error("Erro ao deletar usuário:", response.data);
+        }
+      })
+      .catch((error) => {
+        console.error("Erro ao deletar usuário:", error);
+      });
+  };
+
+  const handleLogout = (event) => {
+    localStorage.removeItem("jwt")
+    navigate('/')
+  };
+
   return (
     <div className="flex flex-col items-center justify-center h-10/12 bg-gray-100 mt-8">
       <h1 className="text-4xl font-bold mb-4 mt-4">Perfil</h1>
       <form className="bg-white p-6 rounded shadow-md w-96">
+        <button
+          type="submit"
+          className="mb-4 bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          onClick={handleLogout}
+        >
+          Log out
+        </button>
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -190,7 +220,7 @@ export default function Profile() {
         <button
           type="submit"
           className="mt-16 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
-          onClick={() => {}}
+          onClick={handleDelete}
         >
           Deletar conta
         </button>

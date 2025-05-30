@@ -56,6 +56,10 @@ def log_in(l: LoginDTO, res: Response, db = Depends(get_db)):
     res.set_cookie(key="jwt", value=jwt, expires=3600 * 24)
     return JWTDTO(jwt=jwt)
 
+@app.post("/users/logout")
+def log_out(id: int, req: Request, db = Depends(get_db)):
+    res.set_cookie(key="jwt", value="", expires=-1)
+
 @app.get("/users/{id}", response_model=UserNoPasswDTO)
 def get_user(id: int, res: Response, db = Depends(get_db)):
     user_dao = db.query(UserDAO).filter(UserDAO.id == id).first()
@@ -72,6 +76,12 @@ def get_user(id: int, res: Response, db = Depends(get_db)):
 
 @app.put("/users/{id}", response_model=UserNoPasswDTO)
 def update_user(u: UpdateUserDTO, id: int, db = Depends(get_db)):
+    uid = get_uid(req)
+    if uid != id:
+        raise HTTPException(
+            status_code=401,
+            detail="Different users",
+        )
     user_dao = db.query(UserDAO).filter(UserDAO.id == id).first()
     if not user_dao:
         raise HTTPException(
@@ -91,6 +101,19 @@ def update_user(u: UpdateUserDTO, id: int, db = Depends(get_db)):
         username=user_dao.username,
         email=user_dao.email,
     )
+
+@app.delete("/users/{id}")
+def update_user(id: int, req: Request, res: Response, db = Depends(get_db)):
+    uid = get_uid(req)
+    if uid != id:
+        raise HTTPException(
+            status_code=401,
+            detail="Different users",
+        )
+    user_dao = db.query(UserDAO).filter(UserDAO.id == id).first()
+    db.delete(user_dao)
+    db.commit()
+    res.set_cookie(key="jwt", value="", expires=-1)
 
 @app.post("/tierlists", response_model=TierlistDTO)
 def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
@@ -162,7 +185,7 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
     )
 
 @app.get("/tierlists", response_model=List[TierlistAllDTO])
-def list_tierlists(req: Request, db = Depends(get_db)):
+def list_tierlists(db = Depends(get_db)):
     tl_dao_list = db.query(TierlistDAO)\
         .options(joinedload(TierlistDAO.image_assocs).joinedload(ImageAssociationsDAO.image))\
         .order_by(TierlistDAO.id.desc())\
@@ -187,10 +210,7 @@ def list_tierlists(req: Request, db = Depends(get_db)):
     return result
 
 @app.get("/tierlists/{id}", response_model=TierlistDTO)
-def get_tierlist_by_id(
-    id: int = Path(..., description="Tierlist ID"),
-    db = Depends(get_db)
-):
+def get_tierlist_by_id(id: int, db = Depends(get_db)):
     tl_dao = db.query(TierlistDAO)\
         .options(
             joinedload(TierlistDAO.tiers),
