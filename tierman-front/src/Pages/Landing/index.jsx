@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useOutletContext } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import Card from "../../Components/Card";
-import { api, backURL } from "../../Services/api";
+import { api, backURL, getJwt } from "../../Services/api";
 
 export default function Landing() {
   const [tierLists, setTierLists] = useState([]);
+  const { setIsLogged } = useOutletContext();
+  setIsLogged(getJwt("jwt"));
 
   useEffect(() => {
     api
