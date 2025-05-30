@@ -1,10 +1,10 @@
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Bounce, toast } from "react-toastify";
 import FormCreateTier from "../../Components/FormCreateTier";
 import ImageUploader from "../../Components/ImageUploader";
 import Tier from "../../Components/Tier";
-import { api, getJwt } from "../../Services/api";
+import { api } from "../../Services/api";
 
 export default function TierCreate() {
   const navigate = useNavigate();
@@ -12,8 +12,6 @@ export default function TierCreate() {
   const [tierListName, setTierListName] = useState("");
   const [creatingTier, setCreatingTier] = useState(true);
   const [files, setFiles] = useState([]);
-  const { setIsLogged } = useOutletContext();
-  setIsLogged(getJwt("jwt"));
 
   const handleImages = (files) => {
     setFiles(files);
