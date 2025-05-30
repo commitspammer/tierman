@@ -153,6 +153,7 @@ export default function Profile() {
         >
           Log out
         </button>
+
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
@@ -168,6 +169,8 @@ export default function Profile() {
             value={formData.email}
             onChange={handleChange}
           />
+        </div>
+        <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="username"
