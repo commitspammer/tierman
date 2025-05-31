@@ -56,7 +56,7 @@ class TierlistDTO(BaseModel):
     tiers: List[TierDTO]
     bag: List[ImageDTO]
 
-class TierlistAllDTO(BaseModel):
+class TierlistCoverDTO(BaseModel):
     id: int
     owner_id: int
     name: str

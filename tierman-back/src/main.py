@@ -8,7 +8,7 @@ from .auth import get_uid
 from .database import init_tables, get_db
 from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, UpdateUserDTO, JWTDTO, UploadedImagesDTO
-from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistAllDTO
+from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistCoverDTO
 from sqlalchemy.orm import joinedload
 import random
 
@@ -184,7 +184,7 @@ def create_tierlist(tl: CreateTierlistDTO, req: Request, db = Depends(get_db)):
         bag = bag
     )
 
-@app.get("/tierlists", response_model=List[TierlistAllDTO])
+@app.get("/tierlists", response_model=List[TierlistCoverDTO])
 def list_tierlists(db = Depends(get_db)):
     tl_dao_list = db.query(TierlistDAO)\
         .options(joinedload(TierlistDAO.image_assocs).joinedload(ImageAssociationsDAO.image))\
@@ -198,7 +198,7 @@ def list_tierlists(db = Depends(get_db)):
         capa_path = capa.path if capa else None
 
         result.append(
-            TierlistAllDTO(
+            TierlistCoverDTO(
                 id=tl.id,
                 name=tl.name,
                 owner_id=tl.owner_id,
@@ -263,6 +263,71 @@ def get_tierlist_by_id(id: int, db = Depends(get_db)):
         tiers=tiers_dto,
         bag=bag
     )
+
+@app.post("/tierlists/{id}/rankings", response_model=TierlistDTO)
+def create_tierlist_ranking(tl: TierlistDTO, id: int, db = Depends(get_db)):
+    tl_dao = db.query(TierlistDAO)\
+        .options(
+            joinedload(TierlistDAO.tiers),
+            joinedload(TierlistDAO.image_assocs).joinedload(ImageAssociationsDAO.image)
+        )\
+        .filter(TierlistDAO.id == id)\
+        .first()
+    tl_dao.id = None
+    tl_dao.is_template = False
+    for t in tl_dao.tiers:
+        t.id = None
+        t.tierlist_id = None
+    for ia in tl_dao.image_assocs:
+        ia.tierlist_id = None
+        for t in tl.tiers:
+            for i in t.images:
+                if ia.image_id == i.id:
+                    ia.tier_id = t.id
+
+    db.add(tl_dao)
+    db.commit()
+    db.refresh(tl_dao)
+    if not tl_dao:
+        raise HTTPException(status_code=404, detail="Tierlist not found")
+    tiers_dto: List[TierDTO] = []
+    bag: List[ImageDTO] = []
+    for t in tl_dao.tiers:
+        tiers_dto.append(TierDTO(
+            id=t.id,
+            name=t.name,
+            color=t.color,
+            tierlist_id=t.tierlist_id,
+            images=[]
+        ))
+    for ia in tl_dao.image_assocs:
+        i = ia.image
+        if ia.tier_id is None:
+            bag.append(ImageDTO(
+                id=i.id,
+                path=i.path,
+                tier_id=None,
+                tierlist_id=tl_dao.id
+            ))
+            continue
+        for t in tiers_dto:
+            if t.id == ia.tier_id:
+                t.images.append(ImageDTO(
+                    id=i.id,
+                    path=i.path,
+                    tier_id=t.id,
+                    tierlist_id=tl_dao.id
+                ))
+                break
+    return TierlistDTO(
+        id=tl_dao.id,
+        name=tl_dao.name,
+        owner_id=tl_dao.owner_id,
+        is_template=tl_dao.is_template,
+        tiers=tiers_dto,
+        bag=bag
+    )
+
 
 @app.post("/images")
 def upload_images(files: List[UploadFile] = File(...)):
