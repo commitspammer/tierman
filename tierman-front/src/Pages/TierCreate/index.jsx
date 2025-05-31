@@ -51,7 +51,7 @@ export default function TierCreate() {
         ) {
           toast.success("Tierlist criada com sucesso!", {
             position: "top-right",
-            autoClose: 1000,
+            autoClose: 500,
             theme: "light",
             transition: Bounce,
             onClose: () => {
@@ -101,7 +101,7 @@ export default function TierCreate() {
           />
         </div>
         <button
-          className="bg-blue-500 text-white px-4 py-2 rounded my-4"
+          className="cursor-pointer bg-blue-500 text-white px-4 py-2 rounded my-4"
           onClick={handleSubmit}
         >
           Criar Tierlist
@@ -115,7 +115,7 @@ export default function TierCreate() {
         <FormCreateTier setCreatingTier={setCreatingTier} setTiers={setTiers} />
       ) : (
         <button
-          className="bg-neutral-400 text-white px-4 py-2 rounded mt-4"
+          className="cursor-pointer bg-neutral-400 text-white px-4 py-2 rounded mt-4"
           onClick={() => setCreatingTier(true)}
         >
           Adicionar Tier

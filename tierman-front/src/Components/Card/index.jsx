@@ -1,9 +1,17 @@
 import { Link } from "react-router-dom";
 
-export default function Card({ description, imageUrl, id }) {
+export default function Card({
+  description,
+  imageUrl,
+  id,
+  is_template = false,
+}) {
   return (
     <div className="w-[140px] h-[130px] bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-200 dark:border-gray-700">
-      <Link to={`/tierlist/${id}`} className="block relative w-full h-full">
+      <Link
+        to={is_template ? `/tierlist/${id}` : `/tier-ranked/${id}`}
+        className="block relative w-full h-full"
+      >
         <div className="relative w-full h-full">
           <img
             className="w-full h-full object-cover rounded-t-lg"

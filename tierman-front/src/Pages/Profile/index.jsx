@@ -65,7 +65,7 @@ export default function Profile() {
     } else if (newPassword !== confirmNewPassword) {
       toast.error("As novas senhas não coincidem", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -148,7 +148,7 @@ export default function Profile() {
       <form className="bg-white p-6 rounded shadow-md w-96">
         <button
           type="submit"
-          className="mb-4 bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          className="cursor-pointer mb-4 bg-yellow-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={handleLogout}
         >
           Log out
@@ -220,14 +220,14 @@ export default function Profile() {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          className="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={handleSubmit}
         >
           Atualizar perfil
         </button>
         <button
           type="submit"
-          className="mt-16 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          className="cursor-pointer mt-16 bg-red-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={handleDelete}
         >
           Deletar conta

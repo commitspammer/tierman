@@ -11,7 +11,7 @@ export default function Layout() {
   }, [isLogged]);
 
   return (
-    <div className="grid grid-rows-[auto_1fr] h-screen bg-gray-100 ">
+    <div className="grid grid-rows-[auto_1fr] min-h-screen max-h-full bg-gray-100 ">
       <Header
         className="grid grid-cols-5 grid-rows-5 gap-4 shadow"
         isLogged={isLogged}

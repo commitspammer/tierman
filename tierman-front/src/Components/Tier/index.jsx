@@ -1,6 +1,9 @@
-export default function Tier({ tierData }) {
+import { backURL } from "../../Services/api";
+import CardDrag from "../CardDrag";
+
+export default function Tier({ tierData, cards }) {
   return (
-    <div className="flex w-full h-[100px] flex-row bg-neutral-800 gap-4 justify-center items-center border-b border-orange-50">
+    <div className="flex w-full h-[100px] flex-row justify-center items-center mb-0.5">
       <h2
         className={`font-semibold text-neutral-100 w-[10%] h-[100px] flex items-center justify-center`}
         style={{ backgroundColor: tierData.color ?? "#ffffff" }}
@@ -8,7 +11,15 @@ export default function Tier({ tierData }) {
         {tierData.name}
       </h2>
       <div className="flex flex-1 flex-col gap-4">
-        <div className="cursor-grab rounded-lg  p-4 shadow-sm hover:shadow-md"></div>
+        <div className="flex bg-neutral-700 min-h-[100px] ">
+          {cards?.map((card, key) => (
+            <CardDrag
+              key={key}
+              id={card.id}
+              imageUrl={`${backURL}${card.path}`}
+            />
+          ))}
+        </div>
       </div>
     </div>
   );

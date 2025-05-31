@@ -38,7 +38,7 @@ export default function Register() {
     } else if (password !== confirmPassword) {
       toast.error("As senhas não coincidem", {
         position: "top-right",
-        autoClose: 1000,
+        autoClose: 500,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -164,7 +164,7 @@ export default function Register() {
         </div>
         <button
           type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
+          className="cursor-pointer bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full"
           onClick={handleSubmit}
         >
           Enviar

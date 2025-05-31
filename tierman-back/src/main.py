@@ -204,6 +204,7 @@ def list_tierlists(db = Depends(get_db)):
                 id=tl.id,
                 name=tl.name,
                 owner_id=tl.owner_id,
+                owner_name=tl.owner.username if tl.owner else None,
                 is_template=tl.is_template,
                 cover_image_path=capa_path
             )
@@ -261,6 +262,7 @@ def get_tierlist_by_id(id: int, db = Depends(get_db)):
         id=tl_dao.id,
         name=tl_dao.name,
         owner_id=tl_dao.owner_id,
+        owner_name=tl_dao.owner.username if tl_dao.owner else None,
         is_template=tl_dao.is_template,
         tiers=tiers_dto,
         bag=bag

@@ -57,7 +57,7 @@ export default function FormCreateTier({ setCreatingTier, setTiers }) {
             <div className="flex flex-col gap-2">
               <button
                 type="button"
-                className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                className="cursor-pointer px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded-lg hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300"
                 onClick={handleSubmit}
                 disabled={!formData.name || !formData.color}
               >
@@ -65,7 +65,7 @@ export default function FormCreateTier({ setCreatingTier, setTiers }) {
               </button>
               <button
                 type="button"
-                className="px-3 py-2 text-xs font-medium text-center text-black bg-stone-300 rounded-lg hover:bg-stone-400 focus:ring-4 focus:outline-none focus:ring-blue-300"
+                className="cursor-pointer px-3 py-2 text-xs font-medium text-center text-black bg-stone-300 rounded-lg hover:bg-stone-400 focus:ring-4 focus:outline-none focus:ring-blue-300"
                 onClick={() => setCreatingTier(false)}
               >
                 Cancelar

@@ -7,6 +7,7 @@ import Profile from "../Pages/Profile";
 import Register from "../Pages/Register";
 import TierCreate from "../Pages/TierCreate";
 import TierlistFill from "../Pages/TierlistFill";
+import TierRanked from "../Pages/TierRanked";
 
 const routes = createBrowserRouter([
   {
@@ -17,6 +18,7 @@ const routes = createBrowserRouter([
       { path: "/profile", element: <Profile /> },
       { path: "/register", element: <Register /> },
       { path: "/tierlist/:id", element: <TierlistFill /> },
+      { path: "/tier-ranked/:id", element: <TierRanked /> },
       {
         element: <ProtectedRoute />,
         children: [{ path: "/create-template", element: <TierCreate /> }],

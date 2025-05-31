@@ -62,14 +62,33 @@ export default function Landing() {
       <div>
         <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
         <div className="flex flex-wrap gap-4">
-          {tierLists.map((item, key) => (
-            <Card
-              key={key}
-              id={item.id}
-              description={item.name}
-              imageUrl={`${backURL}${item.cover_image_path}`}
-            />
-          ))}
+          {tierLists
+            .filter((tierlist) => tierlist.is_template === true)
+            .map((item, key) => (
+              <Card
+                key={key}
+                id={item.id}
+                description={item.name}
+                imageUrl={`${backURL}${item.cover_image_path}`}
+              />
+            ))}
+        </div>
+      </div>
+
+      <div>
+        <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
+        <div className="flex flex-wrap gap-4">
+          {tierLists
+            .filter((tierlist) => tierlist.is_template === false)
+            .map((item, key) => (
+              <Card
+                key={key}
+                id={item.id}
+                description={item.name}
+                imageUrl={`${backURL}${item.cover_image_path}`}
+                is_template={item.is_template}
+              />
+            ))}
         </div>
       </div>
     </div>

@@ -7,8 +7,6 @@ export default function TierDrop({ tierData, cards }) {
     id: tierData.id,
   });
 
-  console.log("TierDrop", cards);
-
   return (
     <div className="flex w-full h-[100px] flex-row justify-center items-center mb-0.5">
       <h2
@@ -22,8 +20,12 @@ export default function TierDrop({ tierData, cards }) {
           ref={setNodeRef}
           className="cursor-grab  flex bg-neutral-700 min-h-[100px] "
         >
-          {cards.map((card) => (
-            <CardDrag id={card.id} imageUrl={`${backURL}${card.path}`} />
+          {cards.map((card, key) => (
+            <CardDrag
+              key={key}
+              id={card.id}
+              imageUrl={`${backURL}${card.path}`}
+            />
           ))}
         </div>
       </div>

@@ -59,7 +59,7 @@ export default function ImageUploader({ onImagesChange }) {
             <button
               type="button"
               onClick={() => handleRemove(index)}
-              className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition"
+              className="cursor-pointer absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-2 py-1 opacity-0 group-hover:opacity-100 transition"
             >
               ×
             </button>

@@ -51,6 +51,7 @@ class TierDTO(BaseModel):
 class TierlistDTO(BaseModel):
     id: int
     owner_id: int
+    owner_name: Optional[str] = None
     name: str
     is_template: bool
     tiers: List[TierDTO]
@@ -59,6 +60,7 @@ class TierlistDTO(BaseModel):
 class TierlistCoverDTO(BaseModel):
     id: int
     owner_id: int
+    owner_name: Optional[str] = None
     name: str
     is_template: bool
     cover_image_path: Optional[str] = None
