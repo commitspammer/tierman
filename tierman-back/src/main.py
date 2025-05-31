@@ -11,6 +11,7 @@ from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, UpdateUserDTO, JWTDTO,
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistCoverDTO
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.session import make_transient
+from sqlalchemy import case
 import random
 
 init_tables()
@@ -284,36 +285,48 @@ def create_tierlist_ranking(tl: TierlistDTO, id: int, db = Depends(get_db)):
     tl_dao.id = None
     tl_dao.is_template = False
 
-    new_tiers = []
-    old_to_new_tier_id = {}
+    old_tier_ids_map = {}
 
     for t in tl_dao.tiers:
+        old_id = t.id
         db.expunge(t)
         make_transient(t)
-        old_id = t.id
         t.id = None
         t.tierlist_id = None
-        new_tiers.append(t)
-        old_to_new_tier_id[old_id] = t
+        old_tier_ids_map[old_id] = t
 
-    tl_dao.tiers = new_tiers
-
-    new_ias = []
     for ia in tl_dao.image_assocs:
         db.expunge(ia)
         make_transient(ia)
-        ia.id = None
         ia.tierlist_id = None
-        if ia.tier_id in old_to_new_tier_id:
-            ia.tier = old_to_new_tier_id[ia.tier_id]
-            ia.tier_id = None
-        new_ias.append(ia)
-
-    tl_dao.image_assocs = new_ias
+        for t in tl.tiers:
+            for i in t.images:
+                if ia.image_id == i.id:
+                    ia.tier_id = t.id
 
     db.add(tl_dao)
     db.commit()
     db.refresh(tl_dao)
+
+    real_id_map = {}
+    for new_tier in tl_dao.tiers:
+        for old_id, t_obj in old_tier_ids_map.items():
+            if t_obj.name == new_tier.name and t_obj.color == new_tier.color:
+                real_id_map[old_id] = new_tier.id
+                break
+
+    print("Real ID Map:", real_id_map)
+
+    db.query(ImageAssociationsDAO).filter(
+        ImageAssociationsDAO.tierlist_id == tl_dao.id
+    ).update({
+        ImageAssociationsDAO.tier_id: case(
+            real_id_map,
+            value=ImageAssociationsDAO.tier_id
+        )
+    }, synchronize_session=False)
+
+    db.commit()
 
     tiers_dto: List[TierDTO] = []
     bag: List[ImageDTO] = []
