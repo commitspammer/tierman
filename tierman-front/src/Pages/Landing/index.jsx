@@ -59,7 +59,7 @@ export default function Landing() {
           Criar Template
         </Link>
       </div>
-      <div>
+      <div className="mb-8">
         <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
         <div className="flex flex-wrap gap-4">
           {tierLists
@@ -70,13 +70,14 @@ export default function Landing() {
                 id={item.id}
                 description={item.name}
                 imageUrl={`${backURL}${item.cover_image_path}`}
+                is_template={item.is_template}
               />
             ))}
         </div>
       </div>
 
       <div>
-        <h1 className="text-2xl font-bold mb-4">Top Tiers</h1>
+        <h1 className="text-2xl font-bold mb-4">Tiers Rankeadas</h1>
         <div className="flex flex-wrap gap-4">
           {tierLists
             .filter((tierlist) => tierlist.is_template === false)
