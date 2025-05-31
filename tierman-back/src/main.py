@@ -10,6 +10,7 @@ from .dao import UserDAO, TierlistDAO, TierDAO, ImageDAO, ImageAssociationsDAO
 from .dto import CreateUserDTO, UserNoPasswDTO, LoginDTO, UpdateUserDTO, JWTDTO, UploadedImagesDTO
 from .dto import CreateTierlistDTO, CreateTierDTO, CreateImageDTO, TierlistDTO, TierDTO, ImageDTO, TierlistCoverDTO
 from sqlalchemy.orm import joinedload
+from sqlalchemy.orm.session import make_transient
 import random
 
 init_tables()
@@ -273,23 +274,47 @@ def create_tierlist_ranking(tl: TierlistDTO, id: int, db = Depends(get_db)):
         )\
         .filter(TierlistDAO.id == id)\
         .first()
+
+    if not tl_dao:
+        raise HTTPException(status_code=404, detail="Tierlist not found")
+
+    db.expunge(tl_dao)
+    make_transient(tl_dao)
+
     tl_dao.id = None
     tl_dao.is_template = False
+
+    new_tiers = []
+    old_to_new_tier_id = {}
+
     for t in tl_dao.tiers:
+        db.expunge(t)
+        make_transient(t)
+        old_id = t.id
         t.id = None
         t.tierlist_id = None
+        new_tiers.append(t)
+        old_to_new_tier_id[old_id] = t
+
+    tl_dao.tiers = new_tiers
+
+    new_ias = []
     for ia in tl_dao.image_assocs:
+        db.expunge(ia)
+        make_transient(ia)
+        ia.id = None
         ia.tierlist_id = None
-        for t in tl.tiers:
-            for i in t.images:
-                if ia.image_id == i.id:
-                    ia.tier_id = t.id
+        if ia.tier_id in old_to_new_tier_id:
+            ia.tier = old_to_new_tier_id[ia.tier_id]
+            ia.tier_id = None
+        new_ias.append(ia)
+
+    tl_dao.image_assocs = new_ias
 
     db.add(tl_dao)
     db.commit()
     db.refresh(tl_dao)
-    if not tl_dao:
-        raise HTTPException(status_code=404, detail="Tierlist not found")
+
     tiers_dto: List[TierDTO] = []
     bag: List[ImageDTO] = []
     for t in tl_dao.tiers:
@@ -319,6 +344,7 @@ def create_tierlist_ranking(tl: TierlistDTO, id: int, db = Depends(get_db)):
                     tierlist_id=tl_dao.id
                 ))
                 break
+            
     return TierlistDTO(
         id=tl_dao.id,
         name=tl_dao.name,
